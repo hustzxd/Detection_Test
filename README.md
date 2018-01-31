@@ -1,5 +1,8 @@
 ### For yolov2
-
+#### YOLO Inference
+```shell
+python yolov2_show.py
+```
 #### Data preparation
 
 ```shell
