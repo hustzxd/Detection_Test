@@ -4,7 +4,9 @@
 python yolov2_show.py
 ```
 
-![example1](http://localhost:8080/AIGroup/Detection_Test/blob/master/data/Pascal_VOC/example_images/example1.png)
+![example1](data/Pascal_VOC/example_images/example1.png)
+![example2](data/Pascal_VOC/example_images/example2.png)
+![example3](data/Pascal_VOC/example_images/example3.png)
 
 #### Data preparation
 
