@@ -1,0 +1,17 @@
+net: "models/darknet_yolov2/train_val-voc.2.0.prototxt"
+test_iter: 309   # * batch = test_size  batch_size = 16
+test_interval: 1034 # * batch = train_size
+test_initialization: false
+
+base_lr: 0.001
+lr_policy: "step"
+gamma: 0.1
+stepsize: 10000
+max_iter: 45000
+
+display: 20
+momentum: 0.9
+weight_decay: 0.0005
+snapshot: 1034
+snapshot_prefix: "models/darknet_yolov2/yolo-voc_train"
+solver_mode: GPU
