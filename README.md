@@ -3,7 +3,7 @@
 ```shell
 python yolov2_show.py
 ```
-![](data/Pascal_VOC/example_images/example.png)
+![](data/Pascal_VOC/example_images/example.jpg)
 
 #### Data preparation
 
