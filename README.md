@@ -3,6 +3,9 @@
 ```shell
 python yolov2_show.py
 ```
+
+![example1](http://localhost:8080/AIGroup/Detection_Test/blob/master/data/Pascal_VOC/example_images/example1.png)
+
 #### Data preparation
 
 ```shell
