@@ -1,3 +1,5 @@
 *.caffemodel
+*.pyc
 data/
 log/
+results/
