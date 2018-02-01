@@ -1,20 +1,24 @@
 import numpy as np
+
+
 class Box(object):
-    def __init__(self, x, y, w, h, prob=0.0, category=-1):
+    def __init__(self, x, y, w, h, prob=0.0, category=-1, image=''):
         self.x = x
         self.y = y
         self.h = h
         self.w = w
         self.prob = prob
         self.category = category
+        self.image = image
 
     def __str__(self):
         return "({0},{1},{2},{3},{4},{5})".format(self.x, self.y, self.w, self.h, self.prob, self.category)
 
 
 class rec_result(object):
-    def __init__(self, idx, conf, xmin, ymin, xmax, ymax):
-        self.idx = idx
+    def __init__(self, image_id, idx, conf, xmin, ymin, xmax, ymax):
+        self.image_id = image_id
+        self.idx = idx  # category
         self.conf = conf
         self.xmin = xmin
         self.ymin = ymin
