@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image, ImageDraw, ImageFont
 import matplotlib.image as mpimg
-
+import sys
 
 class Box(object):
     def __init__(self, x, y, w, h, prob=0.0, category=-1):
@@ -76,6 +76,7 @@ def draw_image(pic_name, new_len, boxes, namelist_file):
         font_size = 20
         my_font = ImageFont.truetype("/usr/share/fonts/truetype/ubuntu-font-family/Ubuntu-M.ttf", size=font_size)
         draw.text([left + 5, top], category, font=my_font, fill=color)
+        print('[{} {} {} {}]'.format(left, top, right, bot))
     #     im.show()
     # plt.imshow(im)
     im.show()
@@ -113,19 +114,19 @@ def main():
     caffe.set_device(0)
     caffe.set_mode_gpu()
     # caffe.set_mode_cpu()
-    pic_name = 'data/Pascal_VOC/VOCdevkit/VOC2007/JPEGImages/000003.jpg'
+    # pic_name = 'data/Pascal_VOC/VOCdevkit/VOC2007/JPEGImages/000003.jpg'
     image = caffe.io.load_image(pic_name)
     new_len, image = fill_image(image)
     # plt.imshow(image)
 
     transformer = caffe.io.Transformer({'data': (1, 3, 416, 416)})
     transformer.set_transpose('data', (2, 0, 1))  # move image channels to outermost dimension
-    transformer.set_channel_swap('data', (2, 1, 0))  # swap channels from RGB to BGR
+    # transformer.set_channel_swap('data', (2, 1, 0))  # swap channels from RGB to BGR
     transformed_image = transformer.preprocess('data', image)
     print(transformed_image.shape)
 
-    model_def = 'models/darknet_yolov2/deploy-voc.2.1.prototxt'
-    model_weights = 'models/darknet_yolov2/yolo-voc.2.0.caffemodel'
+    # model_def = 'models/darknet_yolov2/deploy-voc.2.1.prototxt'
+    # model_weights = 'models/darknet_yolov2/yolo-voc.2.0.caffemodel'
 
     net = caffe.Net(model_def, model_weights, caffe.TEST)
     net.blobs['data'].reshape(1, 3, 416, 416)
@@ -148,4 +149,10 @@ def main():
 
 
 if __name__ == '__main__':
+    if len(sys.argv) != 4:
+        print('Usage: python [prototxt] [caffemodel] [image_path]')
+        exit(0)
+    model_def = sys.argv[1]
+    model_weights = sys.argv[2]
+    pic_name = sys.argv[3]
     main()

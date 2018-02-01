@@ -12,7 +12,8 @@ class Box(object):
         self.image = image
 
     def __str__(self):
-        return "({0},{1},{2},{3},{4},{5})".format(self.x, self.y, self.w, self.h, self.prob, self.category)
+        return "({0},{1},{2},{3},{4},{5},{6})".format(self.x, self.y, self.w, self.h, 
+    self.prob, self.category, self.image)
 
 
 class rec_result(object):

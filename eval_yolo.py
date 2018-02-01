@@ -52,7 +52,7 @@ def _write_results_for_eval(_model_def, _model_weights, _devkit_path):
     batch_num = int(list_len / batch_size)
     left_num = list_len - batch_size * batch_num
 
-    caffe.set_device(3)  # if we have multiple GPUs, pick the first one
+    caffe.set_device(0)  # if we have multiple GPUs, pick the first one
     caffe.set_mode_gpu()
     net = caffe.Net(_model_def,  # defines the structure of the model
                     _model_weights,  # contains the trained weights
@@ -90,13 +90,16 @@ def _write_results_for_eval(_model_def, _model_weights, _devkit_path):
             index = batch_size * i + batch_id
             box = Box(x=prob[0], y=prob[1], w=prob[2], h=prob[3], prob=prob[4], category=int(prob[5]),
                       image=imagelist[index])
+            # print('box={}'.format(box))
             boxes.append(box)
-        for j in range(batch_size):
-            index = batch_size * i + j
+        # for j in range(batch_size):
+            # index = batch_size * i + j
         for box in boxes:
-            lena = mpimg.imread(imagepath.format(imagelist[index]))
+            lena = mpimg.imread(imagepath.format(box.image))
             height, width = lena.shape[:2]
+            # print('height, width: {}  {}'.format(height, width))
             new_len = max(height, width)
+
             x = box.x
             y = box.y
             h = box.h
@@ -120,12 +123,13 @@ def _write_results_for_eval(_model_def, _model_weights, _devkit_path):
             rec_results.append(
                 rec_result(image_id=box.image, idx=box.category + 1, conf=box.prob, xmin=left, ymin=top, xmax=right,
                            ymax=bot))
+            # print('{} {} {} {}'.format(left, top, right, bot))
 
-            for rec in rec_results:
-                filename.format(_classes[rec.idx])
-                with open(filename.format(_classes[rec.idx]), 'a') as f:
-                    f.write('{0} {1} {2} {3} {4} {5}\n'.format(
-                        rec.image_id, rec.conf, rec.xmin, rec.ymin, rec.xmax, rec.ymax))
+        for rec in rec_results:
+            # print('rec: {}'.format(rec))
+            filename.format(_classes[rec.idx])
+            with open(filename.format(_classes[rec.idx]), 'a') as f:
+                f.write('{0} {1} {2} {3} {4} {5}\n'.format(rec.image_id, rec.conf, rec.xmin, rec.ymin, rec.xmax, rec.ymax))
 
 if __name__ == '__main__':
     if len(sys.argv) != 4:
