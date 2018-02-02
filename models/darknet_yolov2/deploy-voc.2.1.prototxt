@@ -933,8 +933,8 @@ layer {
     classes: 20
     # coords: 4
     boxes_of_each_grid: 5
-    thres_nms: 0.3
-    thres_prob: 0.02                                                                                          
+    thres_nms: 0.45
+    thres_prob: 0.001                                                                                          
     anchor_coords {pw: 1.08 ph: 1.19}
     anchor_coords {pw: 3.42 ph: 4.41}
     anchor_coords {pw: 6.63 ph: 11.38}

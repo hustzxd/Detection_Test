@@ -52,7 +52,7 @@ def _write_results_for_eval(_model_def, _model_weights, _devkit_path):
     batch_num = int(list_len / batch_size)
     left_num = list_len - batch_size * batch_num
 
-    caffe.set_device(0)  # if we have multiple GPUs, pick the first one
+    caffe.set_device(1)  # if we have multiple GPUs, pick the first one
     caffe.set_mode_gpu()
     net = caffe.Net(_model_def,  # defines the structure of the model
                     _model_weights,  # contains the trained weights
