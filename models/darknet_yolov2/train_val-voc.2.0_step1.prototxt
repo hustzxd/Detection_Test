@@ -9,14 +9,18 @@ layer {
   }
   transform_param {
     scale: 0.00390625
+    mirror: false
+    crop_size: 416
+    mean_value: 104
+    mean_value: 117
+    mean_value: 123
   }
   data_param {
-    source: "data/Pascal_VOC/trainval_lmdb_no_padding"
-    batch_size: 1
+    source: "data/Pascal_VOC/train_lmdb"
+    batch_size: 20
     backend: LMDB
   }
 }
-
 layer {
   name: "data"
   type: "BoxData"
@@ -27,22 +31,19 @@ layer {
   }
   transform_param {
     scale: 0.00390625
+    mirror: false
+    crop_size: 416
+    # mean_file: "data/mean.binaryproto"
+    mean_value: 104
+    mean_value: 117
+    mean_value: 123
   }
   data_param {
-    source: "data/Pascal_VOC/trainval_lmdb_no_padding"
-    batch_size: 1
+    source: "data/Pascal_VOC/test_lmdb"
+    batch_size: 5
     backend: LMDB
   }
 }
-# layer {
-#   name: "RGB"
-#   type: "RGB"
-#   bottom: "data_bgr"
-#   top: "data_rgb"
-#   RGB_param {
-#     brg_to_rgb: true
-#   }
-# }
 layer {
   name: "conv1"
   type: "Convolution"
@@ -1257,13 +1258,12 @@ layer {
     kernel_size: 1
     pad: 0
     stride: 1
-    # bias_term: false
+    bias_term: true
     weight_filler {
       type: "xavier"
     }
   }
 }
-#permute maybe cannot be inner layer
 layer{
   name: "permute"
   type: "Permute"
@@ -1271,60 +1271,73 @@ layer{
   top: "permute_conv22"
   permute_param {order: 0 order: 2 order: 3 order: 1}
 }
+layer {
+  name: "det_loss"
+  type: "RegionLoss"
+  bottom: "permute_conv22"
+  bottom: "label"
+  top: "det_loss"
+  loss_weight: 1
+  include {
+    phase: TRAIN
+  }
+  region_loss_param {
+    # step 1:
+    learn_anchor_box: true
+    bias_match: true
+    rescore: false
 
-# layer {
-#   name: "det_loss"
-#   type: "RegionLoss"
-#   bottom: "permute_conv22"
-#   bottom: "label"
-#   top: "det_loss"
-#   loss_weight: 1
-#   # include {
-#   #   phase: TRAIN
-#   # }
-#   region_loss_param {
-#     boxes_of_each_grid: 5
-#     classes: 20
-#     thres_iou: 0.6 #训练时，gt box vs pred box
+    # step 2:
+    # learn_anchor_box: false
+    # bias_match: true
+    # rescore: false
 
-#     object_scale: 5.0
-#     noobject_scale: 1.0
-#     class_scale: 1.0
-#     coord_scale: 1.0
+    # step 3:
+    # learn_anchor_box: false
+    # bias_match: false
+    # rescore: false
 
-#     bias_match: true
-#     rescore: true
-#     softmax: true
-    
-#     anchor_coords {pw: 1.08 ph: 1.19}
-#     anchor_coords {pw: 3.42 ph: 4.41}
-#     anchor_coords {pw: 6.63 ph: 11.38}
-#     anchor_coords {pw: 9.42 ph: 5.11}
-#     anchor_coords {pw: 16.62 ph: 10.52}
-#   }
-# }
-# layer {
-#   name: "eval_det"
-#   type: "EvalDetection"
-#   bottom: "permute_conv22"
-#   bottom: "label"
-#   top: "eval_det"
-#   include {
-#     phase: TEST
-#   }
-#   eval_detection_param {
-#     softmax: true
-#     classes: 20
-#     boxes_of_each_grid: 5
-#     thres_nms: 0.24
-#     thres_prob: 0.2
-#     anchor_coords {pw: 1.08 ph: 1.19}
-#     anchor_coords {pw: 3.42 ph: 4.41}
-#     anchor_coords {pw: 6.63 ph: 11.38}
-#     anchor_coords {pw: 9.42 ph: 5.11}
-#     anchor_coords {pw: 16.62 ph: 10.52}
-#     score_type: MULTIPLY
-#     #score_type: OBJ
-#     #score_type: PROB
-#   }
-# }
+    # step 4:
+    # learn_anchor_box: false
+    # bias_match: false
+    # rescore: true
+
+    softmax: true
+    boxes_of_each_grid: 5
+    classes: 20
+    thres_iou: 0.5 #训练时，gt box vs pred box
+
+    object_scale: 5.0
+    noobject_scale: 1.0
+    class_scale: 1.0
+    coord_scale: 1.0
+
+    anchor_coords {pw: 1.08 ph: 1.19}
+    anchor_coords {pw: 3.42 ph: 4.41}
+    anchor_coords {pw: 6.63 ph: 11.38}
+    anchor_coords {pw: 9.42 ph: 5.11}
+    anchor_coords {pw: 16.62 ph: 10.52}
+  }
+}
+layer {
+  name: "eval_det"
+  type: "EvalDetection"
+  bottom: "permute_conv22"
+  bottom: "label"
+  top: "eval_det"
+  include {
+    phase: TEST
+  }
+  eval_detection_param {
+    softmax: true
+    classes: 20
+    boxes_of_each_grid: 5
+    thres_nms: 0.24
+    thres_prob: 0.2
+    anchor_coords {pw: 1.08 ph: 1.19}
+    anchor_coords {pw: 3.42 ph: 4.41}
+    anchor_coords {pw: 6.63 ph: 11.38}
+    anchor_coords {pw: 9.42 ph: 5.11}
+    anchor_coords {pw: 16.62 ph: 10.52}
+  }
+}

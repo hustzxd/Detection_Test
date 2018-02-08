@@ -22,10 +22,13 @@ def _write_results_for_eval(_model_def, _model_weights, _devkit_path):
                 'cow', 'diningtable', 'dog', 'horse',
                 'motorbike', 'person', 'pottedplant',
                 'sheep', 'sofa', 'train', 'tvmonitor')
+    # _res_prefix = os.path.join(
+    #     _res_prefix,
+    #     'results/VOC' + _year,
+    #     'Main')
     _res_prefix = os.path.join(
         _res_prefix,
-        'results/VOC' + _year,
-        'Main')
+        'results')
     imagesetfile = os.path.join(
         _devkit_path,
         'VOC' + _year,
@@ -47,12 +50,12 @@ def _write_results_for_eval(_model_def, _model_weights, _devkit_path):
             os.mknod(filename.format(cls))
     imagelist = list_voc_test(imagesetfile)
     list_len = len(imagelist)
-    batch_size = 32
+    batch_size = 50
     print('batch_size{}'.format(batch_size))
     batch_num = int(list_len / batch_size)
     left_num = list_len - batch_size * batch_num
 
-    caffe.set_device(1)  # if we have multiple GPUs, pick the first one
+    caffe.set_device(2)  # if we have multiple GPUs, pick the first one
     caffe.set_mode_gpu()
     net = caffe.Net(_model_def,  # defines the structure of the model
                     _model_weights,  # contains the trained weights

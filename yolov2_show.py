@@ -111,7 +111,7 @@ def fill_image(image):
 
 
 def main():
-    caffe.set_device(0)
+    caffe.set_device(2)
     caffe.set_mode_gpu()
     # caffe.set_mode_cpu()
     # pic_name = 'data/Pascal_VOC/VOCdevkit/VOC2007/JPEGImages/000003.jpg'
@@ -121,7 +121,7 @@ def main():
 
     transformer = caffe.io.Transformer({'data': (1, 3, 416, 416)})
     transformer.set_transpose('data', (2, 0, 1))  # move image channels to outermost dimension
-    # transformer.set_channel_swap('data', (2, 1, 0))  # swap channels from RGB to BGR
+    transformer.set_channel_swap('data', (2, 1, 0))  # swap channels from RGB to BGR
     transformed_image = transformer.preprocess('data', image)
     print(transformed_image.shape)
 

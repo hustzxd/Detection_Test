@@ -1,5 +1,7 @@
 *.caffemodel
+*.solverstate
 *.pyc
 data/
 log/
 results/
+.ipynb_checkpoints/

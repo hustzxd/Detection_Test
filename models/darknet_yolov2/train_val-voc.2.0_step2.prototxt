@@ -1,21 +1,67 @@
 name: "YOLONET"
 layer {
   name: "data"
-  type: "Input"
+  type: "BoxData"
   top: "data"
-  input_param { shape: { dim: 1 dim: 3 dim: 416 dim: 416 } }
+  top: "label"
+  include {
+    phase: TRAIN
+  }
+  transform_param {
+    scale: 0.00390625
+    mirror: false
+    crop_size: 416
+    mean_value: 104
+    mean_value: 117
+    mean_value: 123
+  }
+  data_param {
+    source: "data/Pascal_VOC/train_lmdb"
+    batch_size: 20
+    backend: LMDB
+  }
+}
+layer {
+  name: "data"
+  type: "BoxData"
+  top: "data"
+  top: "label"
+  include {
+    phase: TEST
+  }
+  transform_param {
+    scale: 0.00390625
+    mirror: false
+    crop_size: 416
+    # mean_file: "data/mean.binaryproto"
+    mean_value: 104
+    mean_value: 117
+    mean_value: 123
+  }
+  data_param {
+    source: "data/Pascal_VOC/test_lmdb"
+    batch_size: 10
+    backend: LMDB
+  }
 }
 layer {
   name: "conv1"
   type: "Convolution"
   bottom: "data"
   top: "conv1"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
   convolution_param {
     num_output: 32
     kernel_size: 3
     pad: 1
     stride: 1
     bias_term: false
+    weight_filler {
+      type: "xavier"
+    }
   }
 }
 layer {
@@ -29,8 +75,23 @@ layer {
   type: "Scale"
   bottom: "conv1"
   top: "conv1"
+  param { # scale
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param { # bias
+    lr_mult: 1
+    decay_mult: 0
+  }
+  #default 1, 0
   scale_param {
     bias_term: true
+    filler {
+      value: 1
+    }
+    bias_filler {
+      value: 0
+    }
   }
 }
 layer {
@@ -40,7 +101,7 @@ layer {
   top: "conv1"
   relu_param{
     negative_slope: 0.1
-  }		
+  }   
 }
 layer {
   name: "pool1"
@@ -58,12 +119,19 @@ layer{
   type: "Convolution"
   bottom: "pool1"
   top: "conv2"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
   convolution_param {
     num_output: 64
     kernel_size: 3
     pad: 1
     stride: 1
     bias_term: false
+    weight_filler {
+      type: "xavier"
+    }
   }
 }
 layer {
@@ -77,6 +145,14 @@ layer {
   type: "Scale"
   bottom: "conv2"
   top: "conv2"
+  param { # scale
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param { # bias
+    lr_mult: 1
+    decay_mult: 0
+  }
   scale_param {
     bias_term: true
   }
@@ -107,12 +183,19 @@ layer{
   type: "Convolution"
   bottom: "pool2"
   top: "conv3"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
   convolution_param {
     num_output: 128
     kernel_size: 3
     pad: 1
     stride: 1
     bias_term: false
+    weight_filler {
+      type: "xavier"
+    }
   }
 }
 layer {
@@ -126,6 +209,14 @@ layer {
   type: "Scale"
   bottom: "conv3"
   top: "conv3"
+  param { # scale
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param { # bias
+    lr_mult: 1
+    decay_mult: 0
+  }
   scale_param {
     bias_term: true
   }
@@ -137,7 +228,7 @@ layer {
   top: "conv3"
   relu_param{
     negative_slope: 0.1
-  }		
+  }   
 }
 
 
@@ -146,12 +237,19 @@ layer{
   type: "Convolution"
   bottom: "conv3"
   top: "conv4"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
   convolution_param {
     num_output: 64
     kernel_size: 1
     pad: 0 #??
     stride: 1
     bias_term: false
+    weight_filler {
+      type: "xavier"
+    }
   }
 }
 layer {
@@ -165,6 +263,14 @@ layer {
   type: "Scale"
   bottom: "conv4"
   top: "conv4"
+  param { # scale
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param { # bias
+    lr_mult: 1
+    decay_mult: 0
+  }
   scale_param {
     bias_term: true
   }
@@ -176,7 +282,7 @@ layer {
   top: "conv4"
   relu_param{
     negative_slope: 0.1
-  }		
+  }   
 }
 
 layer{
@@ -184,12 +290,19 @@ layer{
   type: "Convolution"
   bottom: "conv4"
   top: "conv5"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
   convolution_param {
     num_output: 128
     kernel_size: 3
     pad: 1
     stride: 1
     bias_term: false
+    weight_filler {
+      type: "xavier"
+    }
   }
 }
 layer {
@@ -203,6 +316,14 @@ layer {
   type: "Scale"
   bottom: "conv5"
   top: "conv5"
+  param { # scale
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param { # bias
+    lr_mult: 1
+    decay_mult: 0
+  }
   scale_param {
     bias_term: true
   }
@@ -214,7 +335,7 @@ layer {
   top: "conv5"
   relu_param{
     negative_slope: 0.1
-  }		
+  }   
 }
 layer {
   name: "pool5"
@@ -233,12 +354,19 @@ layer{
   type: "Convolution"
   bottom: "pool5"
   top: "conv6"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
   convolution_param {
     num_output: 256
     kernel_size: 3
     pad: 1
     stride: 1
     bias_term: false
+    weight_filler {
+      type: "xavier"
+    }
   }
 }
 layer {
@@ -252,6 +380,14 @@ layer {
   type: "Scale"
   bottom: "conv6"
   top: "conv6"
+  param { # scale
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param { # bias
+    lr_mult: 1
+    decay_mult: 0
+  }
   scale_param {
     bias_term: true
   }
@@ -263,7 +399,7 @@ layer {
   top: "conv6"
   relu_param{
     negative_slope: 0.1
-  }		
+  }   
 }
 
 layer{
@@ -271,12 +407,19 @@ layer{
   type: "Convolution"
   bottom: "conv6"
   top: "conv7"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
   convolution_param {
     num_output: 128
     kernel_size: 1
     pad: 0
     stride: 1
     bias_term: false
+    weight_filler {
+      type: "xavier"
+    }
   }
 }
 layer {
@@ -290,6 +433,14 @@ layer {
   type: "Scale"
   bottom: "conv7"
   top: "conv7"
+  param { # scale
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param { # bias
+    lr_mult: 1
+    decay_mult: 0
+  }
   scale_param {
     bias_term: true
   }
@@ -301,7 +452,7 @@ layer {
   top: "conv7"
   relu_param{
     negative_slope: 0.1
-  }		
+  }   
 }
 
 layer{
@@ -309,12 +460,19 @@ layer{
   type: "Convolution"
   bottom: "conv7"
   top: "conv8"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
   convolution_param {
     num_output: 256
     kernel_size: 3
     pad: 1
     stride: 1
     bias_term: false
+    weight_filler {
+      type: "xavier"
+    }
   }
 }
 layer {
@@ -328,6 +486,14 @@ layer {
   type: "Scale"
   bottom: "conv8"
   top: "conv8"
+  param { # scale
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param { # bias
+    lr_mult: 1
+    decay_mult: 0
+  }
   scale_param {
     bias_term: true
   }
@@ -339,7 +505,7 @@ layer {
   top: "conv8"
   relu_param{
     negative_slope: 0.1
-  }		
+  }   
 }
 layer {
   name: "pool8"
@@ -358,12 +524,19 @@ layer{
   type: "Convolution"
   bottom: "pool8"
   top: "conv9"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
   convolution_param {
     num_output: 512
     kernel_size: 3
     pad: 1
     stride: 1
     bias_term: false
+    weight_filler {
+      type: "xavier"
+    }
   }
 }
 layer {
@@ -377,6 +550,14 @@ layer {
   type: "Scale"
   bottom: "conv9"
   top: "conv9"
+  param { # scale
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param { # bias
+    lr_mult: 1
+    decay_mult: 0
+  }
   scale_param {
     bias_term: true
   }
@@ -388,7 +569,7 @@ layer {
   top: "conv9"
   relu_param{
     negative_slope: 0.1
-  }		
+  }   
 }
 
 layer{
@@ -396,12 +577,19 @@ layer{
   type: "Convolution"
   bottom: "conv9"
   top: "conv10"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
   convolution_param {
     num_output: 256
     kernel_size: 1
     pad: 0
     stride: 1
     bias_term: false
+    weight_filler {
+      type: "xavier"
+    }
   }
 }
 layer {
@@ -415,6 +603,14 @@ layer {
   type: "Scale"
   bottom: "conv10"
   top: "conv10"
+  param { # scale
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param { # bias
+    lr_mult: 1
+    decay_mult: 0
+  }
   scale_param {
     bias_term: true
   }
@@ -426,7 +622,7 @@ layer {
   top: "conv10"
   relu_param{
     negative_slope: 0.1
-  }		
+  }   
 }
 
 layer{
@@ -434,12 +630,19 @@ layer{
   type: "Convolution"
   bottom: "conv10"
   top: "conv11"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
   convolution_param {
     num_output: 512
     kernel_size: 3
     pad: 1
     stride: 1
     bias_term: false
+    weight_filler {
+      type: "xavier"
+    }
   }
 }
 layer {
@@ -453,6 +656,14 @@ layer {
   type: "Scale"
   bottom: "conv11"
   top: "conv11"
+  param { # scale
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param { # bias
+    lr_mult: 1
+    decay_mult: 0
+  }
   scale_param {
     bias_term: true
   }
@@ -464,7 +675,7 @@ layer {
   top: "conv11"
   relu_param{
     negative_slope: 0.1
-  }		
+  }   
 }
 
 layer{
@@ -472,12 +683,19 @@ layer{
   type: "Convolution"
   bottom: "conv11"
   top: "conv12"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
   convolution_param {
     num_output: 256
     kernel_size: 1
     pad: 0
     stride: 1
     bias_term: false
+    weight_filler {
+      type: "xavier"
+    }
   }
 }
 layer {
@@ -491,6 +709,14 @@ layer {
   type: "Scale"
   bottom: "conv12"
   top: "conv12"
+  param { # scale
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param { # bias
+    lr_mult: 1
+    decay_mult: 0
+  }
   scale_param {
     bias_term: true
   }
@@ -502,7 +728,7 @@ layer {
   top: "conv12"
   relu_param{
     negative_slope: 0.1
-  }		
+  }   
 }
 
 layer{
@@ -510,12 +736,19 @@ layer{
   type: "Convolution"
   bottom: "conv12"
   top: "conv13"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
   convolution_param {
     num_output: 512
     kernel_size: 3
     pad: 1
     stride: 1
     bias_term: false
+    weight_filler {
+      type: "xavier"
+    }
   }
 }
 layer {
@@ -529,6 +762,14 @@ layer {
   type: "Scale"
   bottom: "conv13"
   top: "conv13"
+  param { # scale
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param { # bias
+    lr_mult: 1
+    decay_mult: 0
+  }
   scale_param {
     bias_term: true
   }
@@ -540,7 +781,7 @@ layer {
   top: "conv13"
   relu_param{
     negative_slope: 0.1
-  }		
+  }   
 }
 layer {
   name: "pool13"
@@ -559,12 +800,19 @@ layer{
   type: "Convolution"
   bottom: "pool13"
   top: "conv14"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
   convolution_param {
     num_output: 1024
     kernel_size: 3
     pad: 1
     stride: 1
     bias_term: false
+    weight_filler {
+      type: "xavier"
+    }
   }
 }
 layer {
@@ -578,6 +826,14 @@ layer {
   type: "Scale"
   bottom: "conv14"
   top: "conv14"
+  param { # scale
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param { # bias
+    lr_mult: 1
+    decay_mult: 0
+  }
   scale_param {
     bias_term: true
   }
@@ -589,7 +845,7 @@ layer {
   top: "conv14"
   relu_param{
     negative_slope: 0.1
-  }		
+  }   
 }
 
 layer{
@@ -597,12 +853,19 @@ layer{
   type: "Convolution"
   bottom: "conv14"
   top: "conv15"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
   convolution_param {
     num_output: 512
     kernel_size: 1
     pad: 0
     stride: 1
     bias_term: false
+    weight_filler {
+      type: "xavier"
+    }
   }
 }
 layer {
@@ -616,6 +879,14 @@ layer {
   type: "Scale"
   bottom: "conv15"
   top: "conv15"
+  param { # scale
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param { # bias
+    lr_mult: 1
+    decay_mult: 0
+  }
   scale_param {
     bias_term: true
   }
@@ -627,7 +898,7 @@ layer {
   top: "conv15"
   relu_param{
     negative_slope: 0.1
-  }		
+  }   
 }
 
 
@@ -636,12 +907,19 @@ layer{
   type: "Convolution"
   bottom: "conv15"
   top: "conv16"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
   convolution_param {
     num_output: 1024
     kernel_size: 3
     pad: 1
     stride: 1
     bias_term: false
+    weight_filler {
+      type: "xavier"
+    }
   }
 }
 layer {
@@ -655,6 +933,14 @@ layer {
   type: "Scale"
   bottom: "conv16"
   top: "conv16"
+  param { # scale
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param { # bias
+    lr_mult: 1
+    decay_mult: 0
+  }
   scale_param {
     bias_term: true
   }
@@ -666,7 +952,7 @@ layer {
   top: "conv16"
   relu_param{
     negative_slope: 0.1
-  }		
+  }   
 }
 
 layer{
@@ -674,12 +960,19 @@ layer{
   type: "Convolution"
   bottom: "conv16"
   top: "conv17"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
   convolution_param {
     num_output: 512
     kernel_size: 1
     pad: 0
     stride: 1
     bias_term: false
+    weight_filler {
+      type: "xavier"
+    }
   }
 }
 layer {
@@ -693,6 +986,14 @@ layer {
   type: "Scale"
   bottom: "conv17"
   top: "conv17"
+  param { # scale
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param { # bias
+    lr_mult: 1
+    decay_mult: 0
+  }
   scale_param {
     bias_term: true
   }
@@ -704,7 +1005,7 @@ layer {
   top: "conv17"
   relu_param{
     negative_slope: 0.1
-  }		
+  }   
 }
 
 
@@ -713,12 +1014,19 @@ layer{
   type: "Convolution"
   bottom: "conv17"
   top: "conv18"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
   convolution_param {
     num_output: 1024
     kernel_size: 3
     pad: 1
     stride: 1
     bias_term: false
+    weight_filler {
+      type: "xavier"
+    }
   }
 }
 layer {
@@ -732,6 +1040,14 @@ layer {
   type: "Scale"
   bottom: "conv18"
   top: "conv18"
+  param { # scale
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param { # bias
+    lr_mult: 1
+    decay_mult: 0
+  }
   scale_param {
     bias_term: true
   }
@@ -743,22 +1059,27 @@ layer {
   top: "conv18"
   relu_param{
     negative_slope: 0.1
-  }		
+  }   
 }
-
-
 
 layer{
   name: "conv19"
   type: "Convolution"
   bottom: "conv18"
   top: "conv19"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
   convolution_param {
     num_output: 1024
     kernel_size: 3
     pad: 1
     stride: 1
     bias_term: false
+    weight_filler {
+      type: "xavier"
+    }
   }
 }
 layer {
@@ -772,6 +1093,14 @@ layer {
   type: "Scale"
   bottom: "conv19"
   top: "conv19"
+  param { # scale
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param { # bias
+    lr_mult: 1
+    decay_mult: 0
+  }
   scale_param {
     bias_term: true
   }
@@ -783,22 +1112,27 @@ layer {
   top: "conv19"
   relu_param{
     negative_slope: 0.1
-  }		
+  }   
 }
-
-
 
 layer{
   name: "conv20"
   type: "Convolution"
   bottom: "conv19"
   top: "conv20"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
   convolution_param {
     num_output: 1024
     kernel_size: 3
     pad: 1
     stride: 1
     bias_term: false
+    weight_filler {
+      type: "xavier"
+    }
   }
 
 }
@@ -813,6 +1147,14 @@ layer {
   type: "Scale"
   bottom: "conv20"
   top: "conv20"
+  param { # scale
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param { # bias
+    lr_mult: 1
+    decay_mult: 0
+  }
   scale_param {
     bias_term: true
   }
@@ -824,7 +1166,7 @@ layer {
   top: "conv20"
   relu_param {
     negative_slope: 0.1
-  }		
+  }   
 }
 
 layer {
@@ -838,24 +1180,31 @@ layer {
 }
 
 layer {
-  name: "concat2"
+  name: "concat1"
   type: "Concat"
   bottom: "reorg1"
   bottom: "conv20"
-  top: "concat2"
+  top: "concat1"
 }
 
 layer{
   name: "conv21"
   type: "Convolution"
-  bottom: "concat2"
+  bottom: "concat1"
   top: "conv21"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
   convolution_param {
     num_output: 1024
     kernel_size: 3
     pad: 1
     stride: 1
     bias_term: false
+    weight_filler {
+      type: "xavier"
+    }
   }
 }
 layer {
@@ -869,6 +1218,14 @@ layer {
   type: "Scale"
   bottom: "conv21"
   top: "conv21"
+  param { # scale
+    lr_mult: 1
+    decay_mult: 0
+  }
+  param { # bias
+    lr_mult: 1
+    decay_mult: 0
+  }
   scale_param {
     bias_term: true
   }
@@ -880,7 +1237,7 @@ layer {
   top: "conv21"
   relu_param{
     negative_slope: 0.1
-  }		
+  }   
 }
 
 layer {
@@ -888,20 +1245,25 @@ layer {
   type: "Convolution"
   bottom: "conv21"
   top: "conv22"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
   convolution_param {
     num_output: 125
     kernel_size: 1
     pad: 0
     stride: 1
+    bias_term: true
+    weight_filler {
+      type: "xavier"
+    }
   }
 }
-# layer {
-#   name: "relu22"
-#   type: "ReLU"
-#   bottom: "conv22"
-#   top: "conv22"
-# }
-
 layer{
   name: "permute"
   type: "Permute"
@@ -909,32 +1271,47 @@ layer{
   top: "permute_conv22"
   permute_param {order: 0 order: 2 order: 3 order: 1}
 }
-
-# layer {
-#   name: "region1"
-#   type: "Region"
-#   bottom: "permute_conv_22"
-#   top: "region1"
-#   region_param {
-#     classes: 20
-#     # coords: 4
-#     boxes_of_each_grid: 5
-#     softmax: true
-#   }
-# }
-
 layer {
-  name: "region_output"
-  type: "RegionOutput"
+  name: "det_loss"
+  type: "RegionLoss"
   bottom: "permute_conv22"
-  top: "region_output"
-  region_output_param {
+  bottom: "label"
+  top: "det_loss"
+  loss_weight: 1
+  include {
+    phase: TRAIN
+  }
+  region_loss_param {
+    # step 1:
+    # learn_anchor_box: true
+    # bias_match: true
+    # rescore: false
+
+    # step 2:
+    # learn_anchor_box: false
+    # bias_match: true
+    # rescore: false
+
+    # step 3:
+    # learn_anchor_box: false
+    # bias_match: false
+    # rescore: false
+
+    # step 4:
+    learn_anchor_box: false
+    bias_match: true
+    rescore: true
+
     softmax: true
-    classes: 20
-    # coords: 4
     boxes_of_each_grid: 5
-    thres_nms: 0.45
-    thres_prob: 0.001                                                                                          
+    classes: 20
+    thres_iou: 0.5 #训练时，gt box vs pred box
+
+    object_scale: 5.0
+    noobject_scale: 1.0
+    class_scale: 1.0
+    coord_scale: 1.0
+
     anchor_coords {pw: 1.08 ph: 1.19}
     anchor_coords {pw: 3.42 ph: 4.41}
     anchor_coords {pw: 6.63 ph: 11.38}
@@ -942,4 +1319,25 @@ layer {
     anchor_coords {pw: 16.62 ph: 10.52}
   }
 }
-#http://ethereon.github.io/netscope/#/gist/9640ecb59a75f230446e7c70d2f8bcf3
+layer {
+  name: "eval_det"
+  type: "EvalDetection"
+  bottom: "permute_conv22"
+  bottom: "label"
+  top: "eval_det"
+  include {
+    phase: TEST
+  }
+  eval_detection_param {
+    softmax: true
+    classes: 20
+    boxes_of_each_grid: 5
+    thres_nms: 0.24
+    thres_prob: 0.2
+    anchor_coords {pw: 1.08 ph: 1.19}
+    anchor_coords {pw: 3.42 ph: 4.41}
+    anchor_coords {pw: 6.63 ph: 11.38}
+    anchor_coords {pw: 9.42 ph: 5.11}
+    anchor_coords {pw: 16.62 ph: 10.52}
+  }
+}
