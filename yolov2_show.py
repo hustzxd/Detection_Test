@@ -118,10 +118,12 @@ def main():
     image = caffe.io.load_image(pic_name)
     new_len, image = fill_image(image)
     # plt.imshow(image)
-
+    mu = np.array([104, 117, 123])
+    mu = mu / 256.0
     transformer = caffe.io.Transformer({'data': (1, 3, 416, 416)})
     transformer.set_transpose('data', (2, 0, 1))  # move image channels to outermost dimension
     transformer.set_channel_swap('data', (2, 1, 0))  # swap channels from RGB to BGR
+    transformer.set_mean('data', mu)  # subtract the dataset-mean value in each channel
     transformed_image = transformer.preprocess('data', image)
     print(transformed_image.shape)
 

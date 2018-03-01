@@ -1,49 +1,49 @@
-name: "YOLONET"
+name: "YOLONET-CLASSIFICATION"
 layer {
-  name: "data"
-  type: "BoxData"
-  top: "data"
-  top: "label"
-  include {
-    phase: TRAIN
-  }
-  transform_param {
-    scale: 0.00390625
-    mirror: false
-    crop_size: 416
-    mean_value: 104
-    mean_value: 117
-    mean_value: 123
-  }
-  data_param {
-    source: "data/PascalVOCData/mini_train_lmdb"
-    batch_size: 1
+    name: "data"
+    type: "Data"
+    top: "data"
+    top: "label"
+    include {
+        phase: TRAIN
+    }
+    transform_param {
+        scale: 0.00390625
+        mirror: true
+        crop_size: 224
+        mean_value: 104
+        mean_value: 117
+        mean_value: 123
+    }
+    data_param {
+    source: "data/ImageNetData/train_lmdb"
+    batch_size: 64
     backend: LMDB
-  }
+    }
 }
 layer {
-  name: "data"
-  type: "BoxData"
-  top: "data"
-  top: "label"
-  include {
-    phase: TEST
-  }
-  transform_param {
-    scale: 0.00390625
-    mirror: false
-    crop_size: 416
-    # mean_file: "data/mean.binaryproto"
-    mean_value: 104
-    mean_value: 117
-    mean_value: 123
-  }
-  data_param {
-    source: "data/PascalVOCData/mini_test_lmdb"
-    batch_size: 1
+    name: "data"
+    type: "Data"
+    top: "data"
+    top: "label"
+    include {
+        phase: TEST
+    }
+    transform_param {
+        mirror: false
+        scale: 0.00390625
+        crop_size: 224
+        mean_value: 104
+        mean_value: 117
+        mean_value: 123
+    }
+    data_param {
+    source: "data/ImageNetData/val_lmdb"
+    batch_size: 16
     backend: LMDB
-  }
+    }
 }
+
 layer {
   name: "conv1"
   type: "Convolution"
@@ -1168,191 +1168,75 @@ layer {
     negative_slope: 0.1
   }   
 }
-
+######################add for ImageNet classification
 layer {
-  name: "reorg1"
-  type: "Reorg"
-  bottom: "conv13"
-  top: "reorg1"
-  reorg_param {
-    stride: 2
-  }
-}
-
-layer {
-  name: "concat1"
-  type: "Concat"
-  bottom: "reorg1"
+  name: "pool20"
+  type: "Pooling"
   bottom: "conv20"
-  top: "concat1"
-}
-
-layer{
-  name: "conv21"
-  type: "Convolution"
-  bottom: "concat1"
-  top: "conv21"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  convolution_param {
-    num_output: 1024
-    kernel_size: 3
-    pad: 1
-    stride: 1
-    bias_term: false
-    weight_filler {
-      type: "xavier"
-    }
+  top: "pool20"
+  pooling_param {
+    pool: AVE
+    global_pooling: true
   }
 }
 layer {
-  name: "bn21"
-  type: "BatchNorm"
-  bottom: "conv21"
-  top: "conv21"
-}
-layer {
-  name: "scale21"
-  type: "Scale"
-  bottom: "conv21"
-  top: "conv21"
-  param { # scale
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param { # bias
-    lr_mult: 1
-    decay_mult: 0
-  }
-  scale_param {
-    bias_term: true
-  }
-}
-layer {
-  name: "relu21"
-  type: "ReLU"
-  bottom: "conv21"
-  top: "conv21"
-  relu_param{
-    negative_slope: 0.1
-  }   
-}
-
-layer {
-  name: "conv22"
-  type: "Convolution"
-  bottom: "conv21"
-  top: "conv22"
+  bottom: "pool20"
+  top: "fc1000"
+  name: "fc1000"
+  type: "InnerProduct"
   param {
     lr_mult: 1
     decay_mult: 1
   }
   param {
     lr_mult: 2
-    decay_mult: 0
+    decay_mult: 1
   }
-  convolution_param {
-    num_output: 125
-    kernel_size: 1
-    pad: 0
-    stride: 1
-    bias_term: true
+  inner_product_param {
+    num_output: 1000
     weight_filler {
       type: "xavier"
     }
-  }
-}
-layer{
-  name: "permute"
-  type: "Permute"
-  bottom: "conv22"
-  top: "permute_conv22"
-  permute_param {order: 0 order: 2 order: 3 order: 1}
-}
-layer {
-  name: "det_loss"
-  type: "RegionLoss"
-  bottom: "permute_conv22"
-  bottom: "label"
-  top: "det_loss"
-  loss_weight: 1
-  include {
-    phase: TRAIN
-  }
-  region_loss_param {
-    # step 1:
-    # learn_anchor_box: true
-    # bias_match: true
-    # rescore: true
-
-    # step 2:
-    learn_anchor_box: false
-    bias_match: true
-    rescore: true
-
-    softmax: true
-    boxes_of_each_grid: 5
-    classes: 20
-    thres_iou: 0.5 #训练时，gt box vs pred box
-
-    object_scale: 5.0
-    noobject_scale: 1.0
-    class_scale: 1.0
-    coord_scale: 1.0
-
-    anchor_coords {pw: 1.08 ph: 1.19}
-    anchor_coords {pw: 3.42 ph: 4.41}
-    anchor_coords {pw: 6.63 ph: 11.38}
-    anchor_coords {pw: 9.42 ph: 5.11}
-    anchor_coords {pw: 16.62 ph: 10.52}
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
   }
 }
 layer {
-  name: "eval_det"
-  type: "EvalDetection"
-  bottom: "permute_conv22"
+  bottom: "fc1000"
   bottom: "label"
-  top: "eval_det"
+  name: "loss"
+  type: "SoftmaxWithLoss"
+  top: "loss"
+}
+
+layer {
+  bottom: "fc1000"
+  bottom: "label"
+  top: "acc/top-1"
+  name: "acc/top-1"
+  type: "Accuracy"
   include {
     phase: TEST
   }
-  eval_detection_param {
-    softmax: true
-    classes: 20
-    boxes_of_each_grid: 5
-    thres_nms: 0.24
-    thres_prob: 0.2
-    anchor_coords {pw: 1.08 ph: 1.19}
-    anchor_coords {pw: 3.42 ph: 4.41}
-    anchor_coords {pw: 6.63 ph: 11.38}
-    anchor_coords {pw: 9.42 ph: 5.11}
-    anchor_coords {pw: 16.62 ph: 10.52}
-  }
 }
 
 layer {
-  name: "region_output"
-  type: "RegionOutput"
-  bottom: "permute_conv22"
-  top: "region_output"
+  bottom: "fc1000"
+  bottom: "label"
+  top: "acc/top-5"
+  name: "acc/top-5"
+  type: "Accuracy"
   include {
     phase: TEST
   }
-  region_output_param {
-    softmax: true
-    classes: 20
-    # coords: 4
-    boxes_of_each_grid: 5
-    thres_nms: 0.5
-    thres_prob: 0.1
-    # debug_box: 481
-    # debug_box: 86
-    anchor_coords {pw: 1.08 ph: 1.19}
-    anchor_coords {pw: 3.42 ph: 4.41}
-    anchor_coords {pw: 6.63 ph: 11.38}
-    anchor_coords {pw: 9.42 ph: 5.11}
-    anchor_coords {pw: 16.62 ph: 10.52}
+  accuracy_param {
+    top_k: 5
   }
 }
+
+
+
+
+

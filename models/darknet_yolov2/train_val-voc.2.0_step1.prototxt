@@ -16,8 +16,8 @@ layer {
     mean_value: 123
   }
   data_param {
-    source: "data/Pascal_VOC/train_lmdb"
-    batch_size: 20
+    source: "data/PascalVOCData/mini_train_lmdb"
+    batch_size: 1
     backend: LMDB
   }
 }
@@ -39,8 +39,8 @@ layer {
     mean_value: 123
   }
   data_param {
-    source: "data/Pascal_VOC/test_lmdb"
-    batch_size: 5
+    source: "data/PascalVOCData/mini_test_lmdb"
+    batch_size: 1
     backend: LMDB
   }
 }
@@ -1285,21 +1285,11 @@ layer {
     # step 1:
     learn_anchor_box: true
     bias_match: true
-    rescore: false
+    rescore: true
 
     # step 2:
     # learn_anchor_box: false
     # bias_match: true
-    # rescore: false
-
-    # step 3:
-    # learn_anchor_box: false
-    # bias_match: false
-    # rescore: false
-
-    # step 4:
-    # learn_anchor_box: false
-    # bias_match: false
     # rescore: true
 
     softmax: true
