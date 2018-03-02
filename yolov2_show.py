@@ -40,7 +40,7 @@ def get_color_from_file(filename):
 
 def draw_image(pic_name, new_len, boxes, namelist_file):
     name_list = get_names_from_file(namelist_file)
-    color_list = get_color_from_file('data/Pascal_VOC/ink.color')
+    color_list = get_color_from_file('data/PascalVOCData/ink.color')
     im = Image.open(pic_name)
     draw = ImageDraw.Draw(im)
     lena = mpimg.imread(pic_name)
@@ -111,7 +111,7 @@ def fill_image(image):
 
 
 def main():
-    caffe.set_device(2)
+    caffe.set_device(0)
     caffe.set_mode_gpu()
     # caffe.set_mode_cpu()
     # pic_name = 'data/Pascal_VOC/VOCdevkit/VOC2007/JPEGImages/000003.jpg'
@@ -147,7 +147,7 @@ def main():
         box = Box(prob[0], prob[1], prob[2], prob[3], prob[4], int(prob[5]))
         boxes.append(box)
 
-    draw_image(pic_name, new_len, boxes=boxes, namelist_file='data/Pascal_VOC/label_map.txt')
+    draw_image(pic_name, new_len, boxes=boxes, namelist_file='data/PascalVOCData/label_map.txt')
 
 
 if __name__ == '__main__':

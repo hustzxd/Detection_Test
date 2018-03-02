@@ -16,8 +16,8 @@ layer {
     mean_value: 123
   }
   data_param {
-    source: "data/PascalVOCData/mini_train_lmdb"
-    batch_size: 1
+    source: "data/PascalVOCData/train_lmdb"
+    batch_size: 20
     backend: LMDB
   }
 }
@@ -39,8 +39,8 @@ layer {
     mean_value: 123
   }
   data_param {
-    source: "data/PascalVOCData/mini_test_lmdb"
-    batch_size: 1
+    source: "data/PascalVOCData/test_lmdb"
+    batch_size: 4
     backend: LMDB
   }
 }
@@ -1271,6 +1271,7 @@ layer{
   top: "permute_conv22"
   permute_param {order: 0 order: 2 order: 3 order: 1}
 }
+
 layer {
   name: "det_loss"
   type: "RegionLoss"
@@ -1278,9 +1279,9 @@ layer {
   bottom: "label"
   top: "det_loss"
   loss_weight: 1
-  include {
-    phase: TRAIN
-  }
+  # include {
+  #   phase: TRAIN
+  # }
   region_loss_param {
     # step 1:
     # learn_anchor_box: true
@@ -1322,33 +1323,8 @@ layer {
     softmax: true
     classes: 20
     boxes_of_each_grid: 5
-    thres_nms: 0.24
-    thres_prob: 0.2
-    anchor_coords {pw: 1.08 ph: 1.19}
-    anchor_coords {pw: 3.42 ph: 4.41}
-    anchor_coords {pw: 6.63 ph: 11.38}
-    anchor_coords {pw: 9.42 ph: 5.11}
-    anchor_coords {pw: 16.62 ph: 10.52}
-  }
-}
-
-layer {
-  name: "region_output"
-  type: "RegionOutput"
-  bottom: "permute_conv22"
-  top: "region_output"
-  include {
-    phase: TEST
-  }
-  region_output_param {
-    softmax: true
-    classes: 20
-    # coords: 4
-    boxes_of_each_grid: 5
     thres_nms: 0.5
-    thres_prob: 0.1
-    # debug_box: 481
-    # debug_box: 86
+    thres_prob: 0.2
     anchor_coords {pw: 1.08 ph: 1.19}
     anchor_coords {pw: 3.42 ph: 4.41}
     anchor_coords {pw: 6.63 ph: 11.38}
