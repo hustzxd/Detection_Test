@@ -18,11 +18,11 @@ cwd=cd;
 cwd(cwd=='\')='/';
 
 % change this path to point to your copy of the PASCAL VOC data
-VOCopts.datadir=['/home/zhaoxiandong/projects_i/Detection_Test/data/Pascal_VOC/VOCdevkit/'];
+VOCopts.datadir=['/home/zhaoxiandong/projects/Detection_Test/data/PascalVOCData/VOCdevkit/'];
 
 % change this path to a writable directory for your results
 % VOCopts.resdir=['./results/'];
-VOCopts.resdir=['/home/zhaoxiandong/projects_i/Detection_Test/results/'];
+VOCopts.resdir=['/home/zhaoxiandong/projects/Detection_Test/results/'];
 
 % change this path to a writable local directory for the example code
 VOCopts.localdir=['./local/' VOCopts.dataset './'];

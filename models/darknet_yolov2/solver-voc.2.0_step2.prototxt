@@ -13,5 +13,5 @@ display: 20
 momentum: 0.9
 weight_decay: 0.0005
 snapshot: 500
-snapshot_prefix: "models/darknet_yolov2/yolo-voc_step2"
+snapshot_prefix: "models/darknet_yolov2/yolo-voc_step2_without_change"
 solver_mode: GPU

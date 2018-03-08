@@ -934,7 +934,7 @@ layer {
     # coords: 4
     boxes_of_each_grid: 5
     thres_nms: 0.5
-    thres_prob: 0.1
+    thres_prob: 0.001
     # debug_box: 481
     # debug_box: 421
     anchor_coords {pw: 1.08 ph: 1.19}

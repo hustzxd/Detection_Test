@@ -50,20 +50,23 @@ def _write_results_for_eval(_model_def, _model_weights, _devkit_path):
             os.mknod(filename.format(cls))
     imagelist = list_voc_test(imagesetfile)
     list_len = len(imagelist)
-    batch_size = 50
+    batch_size = 40
     print('batch_size{}'.format(batch_size))
     batch_num = int(list_len / batch_size)
     left_num = list_len - batch_size * batch_num
 
-    caffe.set_device(2)  # if we have multiple GPUs, pick the first one
+    caffe.set_device(1)  # if we have multiple GPUs, pick the first one
     caffe.set_mode_gpu()
     net = caffe.Net(_model_def,  # defines the structure of the model
                     _model_weights,  # contains the trained weights
                     caffe.TEST)  # use test mode (e.g., don't perform dropout)
+    mu = np.array([104, 117, 123])
+    mu = mu / 256.0
     net.blobs['data'].reshape(batch_size, 3, 416, 416)
     transformer = caffe.io.Transformer({'data': (1, 3, 416, 416)})
     transformer.set_transpose('data', (2, 0, 1))  # move image channels to outermost dimension
-    # transformer.set_channel_swap('data', (2, 1, 0))  # swap channels from RGB to BGR
+    transformer.set_channel_swap('data', (2, 1, 0))  # swap channels from RGB to BGR
+    transformer.set_mean('data', mu)  # subtract the dataset-mean value in each channel
     # transformed_image = transformer.preprocess('data', image)
 
     for i in range(batch_num + 1):
