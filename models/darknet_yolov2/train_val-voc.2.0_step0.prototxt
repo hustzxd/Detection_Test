@@ -1,4 +1,4 @@
-name: "YOLONET-CLASSIFICATION"
+name: "darknet19_448"
 layer {
     name: "data"
     type: "Data"
@@ -8,15 +8,15 @@ layer {
         phase: TRAIN
     }
     transform_param {
-        scale: 0.00390625
+        scale: 0.017
         mirror: true
-        crop_size: 224
+        crop_size: 448
         mean_value: 104
         mean_value: 117
         mean_value: 123
     }
     data_param {
-    source: "data/ImageNetData/train_lmdb"
+    source: "data/ImageNetData/train_lmdb_512"
     batch_size: 64
     backend: LMDB
     }
@@ -31,15 +31,15 @@ layer {
     }
     transform_param {
         mirror: false
-        scale: 0.00390625
-        crop_size: 224
+        scale: 0.017
+        crop_size: 448
         mean_value: 104
         mean_value: 117
         mean_value: 123
     }
     data_param {
-    source: "data/ImageNetData/val_lmdb"
-    batch_size: 16
+    source: "data/ImageNetData/val_lmdb_512"
+    batch_size: 10
     backend: LMDB
     }
 }
@@ -1072,147 +1072,35 @@ layer{
     decay_mult: 1
   }
   convolution_param {
-    num_output: 1024
-    kernel_size: 3
-    pad: 1
+    num_output: 1000
+    kernel_size: 1
+    pad: 0
     stride: 1
-    bias_term: false
+    bias_term: true
     weight_filler {
       type: "xavier"
     }
   }
 }
 layer {
-  name: "bn19"
-  type: "BatchNorm"
-  bottom: "conv19"
-  top: "conv19"
-}
-layer {
-  name: "scale19"
-  type: "Scale"
-  bottom: "conv19"
-  top: "conv19"
-  param { # scale
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param { # bias
-    lr_mult: 1
-    decay_mult: 0
-  }
-  scale_param {
-    bias_term: true
-  }
-}
-layer {
-  name: "relu19"
-  type: "ReLU"
-  bottom: "conv19"
-  top: "conv19"
-  relu_param{
-    negative_slope: 0.1
-  }   
-}
-
-layer{
-  name: "conv20"
-  type: "Convolution"
-  bottom: "conv19"
-  top: "conv20"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  convolution_param {
-    num_output: 1024
-    kernel_size: 3
-    pad: 1
-    stride: 1
-    bias_term: false
-    weight_filler {
-      type: "xavier"
-    }
-  }
-
-}
-layer {
-  name: "bn20"
-  type: "BatchNorm"
-  bottom: "conv20"
-  top: "conv20"
-}
-layer {
-  name: "scale20"
-  type: "Scale"
-  bottom: "conv20"
-  top: "conv20"
-  param { # scale
-    lr_mult: 1
-    decay_mult: 0
-  }
-  param { # bias
-    lr_mult: 1
-    decay_mult: 0
-  }
-  scale_param {
-    bias_term: true
-  }
-}
-layer {
-  name: "relu20"
-  type: "ReLU"
-  bottom: "conv20"
-  top: "conv20"
-  relu_param {
-    negative_slope: 0.1
-  }   
-}
-######################add for ImageNet classification
-layer {
-  name: "pool20"
+  name: "pool19"
   type: "Pooling"
-  bottom: "conv20"
-  top: "pool20"
+  bottom: "conv19"
+  top: "pool19"
   pooling_param {
     pool: AVE
     global_pooling: true
   }
 }
 layer {
-  bottom: "pool20"
-  top: "fc1000"
-  name: "fc1000"
-  type: "InnerProduct"
-  param {
-    lr_mult: 1
-    decay_mult: 1
-  }
-  param {
-    lr_mult: 2
-    decay_mult: 1
-  }
-  inner_product_param {
-    num_output: 1000
-    weight_filler {
-      type: "xavier"
-    }
-    bias_filler {
-      type: "constant"
-      value: 0
-    }
-  }
-}
-layer {
-  bottom: "fc1000"
+  bottom: "pool19"
   bottom: "label"
   name: "loss"
   type: "SoftmaxWithLoss"
   top: "loss"
 }
-
 layer {
-  bottom: "fc1000"
+  bottom: "pool19"
   bottom: "label"
   top: "acc/top-1"
   name: "acc/top-1"
@@ -1223,7 +1111,7 @@ layer {
 }
 
 layer {
-  bottom: "fc1000"
+  bottom: "pool19"
   bottom: "label"
   top: "acc/top-5"
   name: "acc/top-5"

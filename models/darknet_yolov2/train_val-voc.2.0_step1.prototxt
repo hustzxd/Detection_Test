@@ -16,8 +16,8 @@ layer {
     mean_value: 123
   }
   data_param {
-    source: "data/PascalVOCData/mini_train_lmdb"
-    batch_size: 1
+    source: "data/PascalVOCData/train_aug_lmdb"
+    batch_size: 16
     backend: LMDB
   }
 }
@@ -39,7 +39,7 @@ layer {
     mean_value: 123
   }
   data_param {
-    source: "data/PascalVOCData/mini_test_lmdb"
+    source: "data/PascalVOCData/test_lmdb"
     batch_size: 1
     backend: LMDB
   }

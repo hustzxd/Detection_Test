@@ -16,8 +16,8 @@ layer {
     mean_value: 123
   }
   data_param {
-    source: "data/PascalVOCData/train_lmdb"
-    batch_size: 20
+    source: "data/PascalVOCData/train_aug_lmdb"
+    batch_size: 16
     backend: LMDB
   }
 }
@@ -1299,7 +1299,7 @@ layer {
     thres_iou: 0.5 #训练时，gt box vs pred box
 
     object_scale: 5.0
-    noobject_scale: 1.0
+    noobject_scale: 0.5
     class_scale: 1.0
     coord_scale: 1.0
 

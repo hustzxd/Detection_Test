@@ -1,16 +1,16 @@
 net: "models/darknet_yolov2/train_val-voc.2.0_step0.prototxt"
-test_iter: 5000
+test_iter: 100
 test_interval: 5000
-base_lr: 0.05
+base_lr: 0.1
 display: 20
 lr_policy: "poly"
 max_iter: 650000
-power: 1
+power: 1.0
 momentum: 0.9
 weight_decay: 0.0005
 snapshot: 5000
 snapshot_prefix: "models/darknet_yolov2/yolo_step0"
-random_seed: 0
+# random_seed: 0
 test_initialization: false
 
 # 首先训练分类网络

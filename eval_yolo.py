@@ -50,7 +50,7 @@ def _write_results_for_eval(_model_def, _model_weights, _devkit_path):
             os.mknod(filename.format(cls))
     imagelist = list_voc_test(imagesetfile)
     list_len = len(imagelist)
-    batch_size = 40
+    batch_size = 30
     print('batch_size{}'.format(batch_size))
     batch_num = int(list_len / batch_size)
     left_num = list_len - batch_size * batch_num
